@@ -16,7 +16,7 @@ class Poligono:
     """representa um polígono com vértices, cor e estado de preenchimento"""
     def __init__(self, vertices: List[Tuple[float, float]]):
         self._vertices = [Ponto(x, y) for x, y in vertices]
-        self._cor_rgb = (255, 0, 0)  # Vermelho como cor padrão
+        self._cor_rgb = (255, 0, 0)  # vermelho como a cor padrão
         self._preenchimento_ativado = False
         self._esta_selecionado = False
 
@@ -50,14 +50,14 @@ class Poligono:
 
     def contem_ponto(self, x: float, y: float, tolerancia: float = 2.0) -> bool:
         """implementação do algoritmo ray-casting com tratamento de arestas"""
-        # Verificação de proximidade com arestas
+        # verificação de proximidade com as arestas
         for i in range(len(self._vertices)):
             p1 = self._vertices[i]
             p2 = self._vertices[(i + 1) % len(self._vertices)]
             if self._calcular_distancia_ponto_segmento(x, y, p1, p2) < tolerancia:
                 return True
 
-        # Algoritmo ray-casting
+        # algoritmo ray-casting
         dentro = False
         n = len(self._vertices)
         
@@ -169,7 +169,7 @@ class AplicacaoRenderizacao:
         for texto, comando in botoes:
             tk.Button(self._frame_toolbar, text=texto, command=comando).pack(side=tk.LEFT)
 
-        # Checkbutton para arestas
+        # checkbutton para as arestas
         self._var_mostrar_arestas = tk.BooleanVar(value=True)
         tk.Checkbutton(
             self._frame_toolbar, 
@@ -225,7 +225,7 @@ class AplicacaoRenderizacao:
                 fill="blue", 
                 width=1
             )
-            # Mostrar pontos temporários
+            # mostra os pontos temporários
             for x, y in self._vertices_temporarios:
                 self._canvas.create_oval(x-3, y-3, x+3, y+3, fill="blue")
 
@@ -235,17 +235,17 @@ class AplicacaoRenderizacao:
         if len(vertices) < 3:
             return
 
-        # 1. Encontrar limites verticais
+        # 1. encontra os limites verticais
         y_min = min(y for x, y in vertices)
         y_max = max(y for x, y in vertices)
 
-        # 2. Criar Edge Table (ET)
+        # 2. cria a Edge Table (ET)
         et = {}
         for i in range(len(vertices)):
             x1, y1 = vertices[i]
             x2, y2 = vertices[(i + 1) % len(vertices)]
 
-            if y1 == y2:  # Ignorar arestas horizontais
+            if y1 == y2:  # ignora as arestas horizontais
                 continue
                 
             if y1 > y2:  # Garantir y1 < y2
@@ -263,39 +263,39 @@ class AplicacaoRenderizacao:
                 'm_inverso': m_inverso
             })
 
-        # 3. Processamento por scanline
+        # 3. processamento por scanline
         aet = []
         for y in range(int(y_min), int(y_max) + 1):
-            # Adicionar novas arestas
+            # adiciona as novas arestas
             if y in et:
                 aet.extend(et[y])
             
-            # Remover arestas concluídas
+            # remove as arestas concluídas
             aet = [edge for edge in aet if edge['y_max'] > y]
             
-            # Ordenar por x_inicial
+            # ordena por x_inicial
             aet.sort(key=lambda edge: edge['x_inicial'])
             
-            # Preencher entre pares de arestas
+            # preenche entre pares de arestas
             for i in range(0, len(aet), 2):
                 if i + 1 < len(aet):
                     x_inicio = int(aet[i]['x_inicial'])
                     x_fim = int(aet[i + 1]['x_inicial'])
-                    # Garantir ordem correta
+                    # garante a ordem correta
                     if x_inicio > x_fim:
                         x_inicio, x_fim = x_fim, x_inicio
-                    # Desenhar linha horizontal de preenchimento
+                    # desenha a linha horizontal de preenchimento
                     self._canvas.create_line(
                         x_inicio, y, x_fim, y,
                         fill="#%02x%02x%02x" % poligono.cor_rgb,
                         width=1
                     )
             
-            # Atualizar x_inicial para próxima linha
+            # atualiza x_inicial para próxima linha
             for edge in aet:
                 edge['x_inicial'] += edge['m_inverso']
 
-    # Métodos de interação
+    # métodos de interação
     def _tratar_clique_esquerdo(self, event):
         """handler para clique esquerdo do mouse"""
         if self._modo_interacao == "desenho":
@@ -318,7 +318,7 @@ class AplicacaoRenderizacao:
         """atualiza a posição do cursor na interface"""
         self._label_coordenadas.config(text=f"Coordenadas: ({event.x}, {event.y})")
 
-    # Métodos de controle
+    # métodos de controle
     def _alternar_modo_interacao(self):
         """alterna entre os modos de desenho e seleção"""
         self._modo_interacao = "selecao" if self._modo_interacao == "desenho" else "desenho"
